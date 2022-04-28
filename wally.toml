@@ -1,15 +1,15 @@
 [package]
 name = "nightcycle/iconlabel"
 description = "like textlabel, but with material icons as provided by fivefactor"
-version = "0.1.0"
+version = "0.1.2"
 authors = ["CJ Oyer <coyer@nightcycle.us>"]
 realm = "shared"
 registry = "https://github.com/upliftgames/wally-index"
 exclude = ["Packages", ".vscode"]
 
 [dependencies]
-format = "nightcycle/format@0.1.0"
-isotope = "nightcycle/isotope@0.1.0"
-coldfusion = "nightcycle/cold-fusion@1.0.1"
+format = "nightcycle/format@0.1.x"
+isotope = "nightcycle/isotope@1.0.x"
+coldfusion = "nightcycle/cold-fusion@1.0.x"
 signal = "quenty/signal@^2.0.0-canary"
 maid = "quenty/maid@^2.0.1-canary"
