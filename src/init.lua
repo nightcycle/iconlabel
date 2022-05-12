@@ -4,10 +4,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local packages = script.Parent
 
-local Fusion = require(packages:WaitForChild("coldfusion"))
 local Isotope = require(packages:WaitForChild("isotope"))
 local Signal = require(packages:WaitForChild("signal"))
-local Format = require(packages:WaitForChild("format"))
 local Spritesheet = require(script:WaitForChild("Spritesheet"))
 
 local GuiObject = {}
@@ -20,32 +18,33 @@ end
 
 function GuiObject.new(config)
 	local self = setmetatable(Isotope.new(config), GuiObject)
-	self.Name = Isotope.import(config.Name, script.Name)
-	self.ClassName = Fusion.Computed(function() return script.Name end)
+	self.Name = self:Import(config.Name, "IconLabel")
+	self.ClassName = self._Fuse.Computed(function() return script.Name end)
 
-	self.IconTransparency = Isotope.import(config.IconTransparency, 0)
-	self.IconColor3 = Isotope.import(config.IconColor3, Color3.new(1,1,1))
-	self.Icon = Isotope.import(config.Icon, nil)
+	self.IconTransparency = self:Import(config.IconTransparency, 0)
+	self.IconColor3 = self:Import(config.IconColor3, Color3.new(1,1,1))
+	self.Icon = self:Import(config.Icon, nil)
 	
-	self.DotsPerInch = Fusion.Value(36)
+	self.DotsPerInch = self._Fuse.Value(36)
 
-	self.IconData = Fusion.Computed(self.Icon, self.DotsPerInch, function(key, dpi)
+	self.IconData = self._Fuse.Computed(self.Icon, self.DotsPerInch, function(key, dpi)
+		if not key then return {} end
 		local iconResolutions = Spritesheet[string.lower(key)] or {}
 		return iconResolutions[dpi]
 	end)
 
 	local parameters = {
-		LayoutOrder = 2,
+		Name = self.Name,
 		BackgroundTransparency = 1,
-		Image = Fusion.Computed(self.IconData, function(iconData)
-			if not iconData then return "" end
-			return iconData.Sheet
+		Image = self._Fuse.Computed(self.IconData, function(iconData)
+			if not iconData or not iconData.Sheet then return "" end
+			return "rbxassetid://"..iconData.Sheet
 		end),
-		ImageRectOffset = Fusion.Computed(self.IconData, function(iconData)
+		ImageRectOffset = self._Fuse.Computed(self.IconData, function(iconData)
 			if not iconData then return Vector2.new(0,0) end
 			return Vector2.new(iconData.X, iconData.Y)
 		end),
-		ImageRectSize = Fusion.Computed(self.DotsPerInch, function(dpi)
+		ImageRectSize = self._Fuse.Computed(self.DotsPerInch, function(dpi)
 			return Vector2.new(dpi, dpi)
 		end),
 		ImageColor3 = self.Color3,
@@ -57,7 +56,7 @@ function GuiObject.new(config)
 		end
 	end
 
-	self.Instance = Fusion.new("ImageLabel")(parameters)
+	self.Instance = self._Fuse.new("ImageLabel")(parameters)
 
 	self._Maid:GiveTask(self.Instance:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
 		if not self.Instance or not self.Instance:IsDescendantOf(game) then return end
@@ -80,7 +79,7 @@ function GuiObject.new(config)
 	end))
 
 	self:Construct()
-	return self
+	return self.Instance
 end
 
 return GuiObject
